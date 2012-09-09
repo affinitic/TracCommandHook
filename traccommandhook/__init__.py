@@ -1,0 +1,1 @@
+from commandhook import TracCommandHook
