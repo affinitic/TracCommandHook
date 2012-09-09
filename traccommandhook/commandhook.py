@@ -15,11 +15,14 @@ def createCommandStringWithParams(configOptions, ticket, command):
             continue
         if name.endswith('-fields'):
             paramName = name.split('-fields')[0]
-            values = [ticket[v] for v in value.split(',')]
+            values = []
+            for v in value.split(','):
+                val = ticket.get_value_or_default(v) or getattr(ticket, v, '')
+                values.append(str(val))
             if paramName in parameters:
-                parameters[paramName]['content'] = ' '.join(values)
+                parameters[paramName]['content'] = ' '.join(values).strip()
             else:
-                parameters[paramName] = {'content': ' '.join(values)}
+                parameters[paramName] = {'content': ' '.join(values).strip()}
         elif name.endswith('-parameter'):
             paramName = name.split('-parameter')[0]
             if paramName in parameters:
