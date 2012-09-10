@@ -18,6 +18,8 @@ def createCommandStringWithParams(configOptions, ticket, command):
             values = []
             for v in value.split(','):
                 val = ticket.get_value_or_default(v) or getattr(ticket, v, '')
+                if isinstance(val, unicode):
+                    val = val.encode('utf-8')
                 values.append(str(val))
             if paramName in parameters:
                 parameters[paramName]['content'] = ' '.join(values).strip()
