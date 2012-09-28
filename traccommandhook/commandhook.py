@@ -4,6 +4,24 @@ from trac.core import Component, implements
 from trac.ticket.api import ITicketChangeListener
 
 
+def shouldNotify(ticket, old_values, handledPriorities):
+    if 'status' in old_values and old_values['status'] == u'closed':
+        # ticket status was closed
+        if ticket['status'] == u'reopened' and \
+           ticket['priority'] in handledPriorities:
+            # ticket was reopened and should be notified
+            return True
+    elif not 'priority' in old_values:
+        # ticket priority didn't change, no need to notify (was already done
+        # if needed)
+        return False
+    elif ticket['priority'] in handledPriorities and \
+         ticket['status'] != u'closed':
+        # we should notify only if ticket is not closed
+        return True
+    return False
+
+
 def createCommandStringWithParams(configOptions, ticket, command):
     """
     Constructs a list with the command and its parameters
@@ -62,10 +80,7 @@ class TracCommandHook(Component):
         """
         env = self.env
         handledPriorities = env.config.getlist('commandhook', 'priorities')
-        if not 'priority' in old_values:
-            # priority didn't change
-            return
-        if ticket['priority'] not in handledPriorities:
+        if not shouldNotify(ticket, old_values, handledPriorities):
             return
         command = env.config.get('commandhook', 'command')
         commandWithParams = createCommandStringWithParams(env.config.options,
