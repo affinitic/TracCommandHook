@@ -19,12 +19,14 @@ The command and its options must be specified in trac.ini : ::
     param.title-parameter = -t
     param.title-fields = summary
     param.message-parameter = -m
-    param.message-fields = id,priority
+    param.message-fields = id," ",priority," ","new ticket" 
 
 In this example, when a ticket (#1) with priority blocker is created or
 modified, the following command will be executed : ::
 
-    /usr/local/bin/growlnotify -t 'Summary of the ticket' -m '1 blocker'
+    /usr/local/bin/growlnotify -t 'Summary of the ticket' -m '1 blocker new ticket'
+
+"" in -fields allow to return hard value, that value will be displayed without the ""
 
 
 Details
