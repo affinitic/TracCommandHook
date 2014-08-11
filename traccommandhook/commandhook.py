@@ -3,6 +3,8 @@ from subprocess import call
 from trac.core import Component, implements
 from trac.ticket.api import ITicketChangeListener
 
+from unidecode import unidecode
+
 
 def shouldNotify(ticket, old_values, handledPriorities):
     if 'status' in old_values and old_values['status'] == u'closed':
@@ -16,7 +18,7 @@ def shouldNotify(ticket, old_values, handledPriorities):
         # if needed)
         return False
     elif ticket['priority'] in handledPriorities and \
-         ticket['status'] != u'closed':
+            ticket['status'] != u'closed':
         # we should notify only if ticket is not closed
         return True
     return False
@@ -31,24 +33,34 @@ def createCommandStringWithParams(configOptions, ticket, command):
     for name, value in optionList:
         if 'param' not in name:
             continue
+
         if name.endswith('-fields'):
             paramName = name.split('-fields')[0]
             values = []
+
             for v in value.split(','):
-                val = ticket.get_value_or_default(v) or getattr(ticket, v, '')
-                if isinstance(val, unicode):
-                    val = val.encode('utf-8')
-                values.append(str(val))
+                if v.startswith('"') and v.endswith('"'):
+                    val = v[1:-1]
+                else:
+                    val = ticket.get_value_or_default(v) or getattr(ticket, v, '',)
+                if isinstance(val, int):
+                    val = unicode(str(val))
+                if not isinstance(val, unicode):
+                    val = unicode(val)
+                values.append(unidecode(val))
+
             if paramName in parameters:
-                parameters[paramName]['content'] = ' '.join(values).strip()
+                parameters[paramName]['content'] = ''.join(values).strip()
             else:
-                parameters[paramName] = {'content': ' '.join(values).strip()}
+                parameters[paramName] = {'content': ''.join(values).strip()}
+
         elif name.endswith('-parameter'):
             paramName = name.split('-parameter')[0]
             if paramName in parameters:
                 parameters[paramName]['param'] = value
             else:
                 parameters[paramName] = {'param': value}
+
     commandWithParams = [command]
     for title, param in parameters.items():
         commandWithParams.append(param['param'])
