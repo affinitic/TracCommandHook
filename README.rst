@@ -14,17 +14,37 @@ Configuration
 The command and its options must be specified in trac.ini : ::
 
     [commandhook]
+    section = commandhookgrowl,commandhookirc
+
+    [commandhookgrowl]
     command = /usr/local/bin/growlnotify
     priorities = blocker
     param.title-parameter = -t
     param.title-fields = summary
     param.message-parameter = -m
-    param.message-fields = id,priority
+    param.message-fields = id," ",priority," ","new ticket" 
+
+    [commandhookirc]
+    priorities = blocker
+    command = /home/jenny/buildout/affinitic.ircutils/bin/send_irc_message
+    param.server-parameter = -s
+    param.server-fields = "irc.freenode.net"
+    param.port-parameter = -p
+    param.port-fields = "6667"
+    param.nickname-parameter = -n
+    param.nickname-fields = "Cat"
+    param.channel-parameter = -c
+    param.channel-fields = "#dog"
+    param.message-parameter = -m
+    param.message-fields = "${trac:project-url}/ticket/",id," A new ticket"," ",priority," has been created by"," ",reporter,": ",summary," assigned to: ",owner
+
 
 In this example, when a ticket (#1) with priority blocker is created or
 modified, the following command will be executed : ::
 
-    /usr/local/bin/growlnotify -t 'Summary of the ticket' -m '1 blocker'
+    /usr/local/bin/growlnotify -t 'Summary of the ticket' -m '1 blocker new ticket'
+
+"" in -fields allow to return hard value, that value will be displayed without the ""
 
 
 Details
