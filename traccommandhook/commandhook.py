@@ -35,14 +35,17 @@ def createCommandStringWithParams(configOptions, ticket, command, section):
             continue
 
         if name.endswith('-fields'):
+
             paramName = name.split('-fields')[0]
             values = []
 
             for v in value.split(','):
+
                 if v.startswith('"') and v.endswith('"'):
                     val = v[1:-1]
                 else:
                     val = ticket.get_value_or_default(v) or getattr(ticket, v, '',)
+                
                 if isinstance(val, int):
                     val = unicode(str(val))
                 if not isinstance(val, unicode):
@@ -61,7 +64,8 @@ def createCommandStringWithParams(configOptions, ticket, command, section):
             else:
                 parameters[paramName] = {'param': value}
 
-    commandWithParams = [command]
+    commandWithParams = []
+    commandWithParams.extend(command)
     for title, param in parameters.items():
         commandWithParams.append(param['param'])
         commandWithParams.append(param['content'])
@@ -84,7 +88,7 @@ class TracCommandHook(Component):
 
             if ticket['priority'] not in handledPriorities:
                 return
-            command = env.config.get(section, 'command')
+            command = env.config.getlist(section, 'command')
             commandWithParams = createCommandStringWithParams(env.config.options,
                                                               ticket,
                                                               command,
@@ -105,7 +109,7 @@ class TracCommandHook(Component):
 
             if not shouldNotify(ticket, old_values, handledPriorities):
                 return
-            command = env.config.get(section, 'command')
+            command = env.config.getlist(section, 'command')
             commandWithParams = createCommandStringWithParams(env.config.options,
                                                               ticket,
                                                               command,
