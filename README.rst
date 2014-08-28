@@ -26,7 +26,7 @@ The command and its options must be specified in trac.ini : ::
 
     [commandhookirc]
     priorities = blocker
-    command = /home/jenny/buildout/affinitic.ircutils/bin/send_irc_message
+    command = /home/jenny/buildout/affinitic.ircutils/bin/send_irc_message,unnamedparam1,unnamedparam2
     param.server-parameter = -s
     param.server-fields = "irc.freenode.net"
     param.port-parameter = -p
