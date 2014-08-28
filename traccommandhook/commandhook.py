@@ -24,11 +24,11 @@ def shouldNotify(ticket, old_values, handledPriorities):
     return False
 
 
-def createCommandStringWithParams(configOptions, ticket, command):
+def createCommandStringWithParams(configOptions, ticket, command, section):
     """
     Constructs a list with the command and its parameters
     """
-    optionList = configOptions('commandhook')
+    optionList = configOptions(section)
     parameters = {}
     for name, value in optionList:
         if 'param' not in name:
@@ -76,30 +76,42 @@ class TracCommandHook(Component):
         Called when a ticket is created.
         """
         env = self.env
-        handledPriorities = env.config.getlist('commandhook', 'priorities')
-        if ticket['priority'] not in handledPriorities:
-            return
-        command = env.config.get('commandhook', 'command')
-        commandWithParams = createCommandStringWithParams(env.config.options,
-                                                          ticket,
-                                                          command)
-        call(commandWithParams)
-        env.log.debug("Ticket %s created. Command executed !" % ticket.id)
+        sections = env.config.getlist('commandhook', 'section')
+        
+        for section in sections:
+
+            handledPriorities = env.config.getlist(section, 'priorities')
+
+            if ticket['priority'] not in handledPriorities:
+                return
+            command = env.config.get(section, 'command')
+            commandWithParams = createCommandStringWithParams(env.config.options,
+                                                              ticket,
+                                                              command,
+                                                              section)
+            call(commandWithParams)
+            env.log.debug("Ticket %s created. Command executed !" % ticket.id)
 
     def ticket_changed(self, ticket, comment, author, old_values):
         """
         Called when a ticket is modified.
         """
         env = self.env
-        handledPriorities = env.config.getlist('commandhook', 'priorities')
-        if not shouldNotify(ticket, old_values, handledPriorities):
-            return
-        command = env.config.get('commandhook', 'command')
-        commandWithParams = createCommandStringWithParams(env.config.options,
-                                                          ticket,
-                                                          command)
-        call(commandWithParams)
-        env.log.debug("Ticket %s changed. Command executed !" % ticket.id)
+        sections = env.config.getlist('commandhook', 'section')
+        
+        for section in sections:
+            
+            handledPriorities = env.config.getlist(section, 'priorities')
+
+            if not shouldNotify(ticket, old_values, handledPriorities):
+                return
+            command = env.config.get(section, 'command')
+            commandWithParams = createCommandStringWithParams(env.config.options,
+                                                              ticket,
+                                                              command,
+                                                              section)
+            call(commandWithParams)
+            env.log.debug("Ticket %s changed. Command executed !" % ticket.id)
 
     def ticket_deleted(self, ticket):
         """
