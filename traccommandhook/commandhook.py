@@ -1,4 +1,4 @@
-from subprocess import call
+from subprocess import Popen
 
 from trac.core import Component, implements
 from trac.ticket.api import ITicketChangeListener
@@ -13,7 +13,7 @@ def shouldNotify(ticket, old_values, handledPriorities):
            ticket['priority'] in handledPriorities:
             # ticket was reopened and should be notified
             return True
-    elif not 'priority' in old_values:
+    elif 'priority' not in old_values:
         # ticket priority didn't change, no need to notify (was already done
         # if needed)
         return False
@@ -45,7 +45,7 @@ def createCommandStringWithParams(configOptions, ticket, command, section):
                     val = v[1:-1]
                 else:
                     val = ticket.get_value_or_default(v) or getattr(ticket, v, '',)
-                
+
                 if isinstance(val, int):
                     val = unicode(str(val))
                 if not isinstance(val, unicode):
@@ -81,7 +81,7 @@ class TracCommandHook(Component):
         """
         env = self.env
         sections = env.config.getlist('commandhook', 'section')
-        
+
         for section in sections:
 
             handledPriorities = env.config.getlist(section, 'priorities')
@@ -93,7 +93,7 @@ class TracCommandHook(Component):
                                                               ticket,
                                                               command,
                                                               section)
-            call(commandWithParams)
+            Popen(commandWithParams)
             env.log.debug("Ticket %s created. Command executed !" % ticket.id)
 
     def ticket_changed(self, ticket, comment, author, old_values):
@@ -102,9 +102,9 @@ class TracCommandHook(Component):
         """
         env = self.env
         sections = env.config.getlist('commandhook', 'section')
-        
+
         for section in sections:
-            
+
             handledPriorities = env.config.getlist(section, 'priorities')
 
             if not shouldNotify(ticket, old_values, handledPriorities):
@@ -114,7 +114,7 @@ class TracCommandHook(Component):
                                                               ticket,
                                                               command,
                                                               section)
-            call(commandWithParams)
+            Popen(commandWithParams)
             env.log.debug("Ticket %s changed. Command executed !" % ticket.id)
 
     def ticket_deleted(self, ticket):
