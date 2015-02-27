@@ -26,21 +26,22 @@ The command and its options must be specified in trac.ini : ::
 
     [commandhookirc]
     priorities = blocker
-    command = /home/jenny/buildout/affinitic.ircutils/bin/send_irc_message,unnamedparam1,unnamedparam2
+    command = affinitic.ircutils/bin/send_irc_message,unnamedparam1,unnamedparam2
     param.server-parameter = -s
     param.server-fields = "irc.freenode.net"
     param.port-parameter = -p
     param.port-fields = "6667"
     param.nickname-parameter = -n
-    param.nickname-fields = "Cat"
+    param.nickname-fields = "BotNickname"
     param.channel-parameter = -c
-    param.channel-fields = "#dog"
+    param.channel-fields = "#ourchannel"
     param.message-parameter = -m
     param.message-fields = "${trac:project-url}/ticket/",id," A new ticket"," ",priority," has been created by"," ",reporter,": ",summary," assigned to: ",owner
 
 
 In this example, when a ticket (#1) with priority blocker is created or
-modified, the following command will be executed : ::
+modified, the following command will be executed (first part of the example
+above; the second command will of course be executed as well) : ::
 
     /usr/local/bin/growlnotify -t 'Summary of the ticket' -m '1 blocker new ticket'
 
