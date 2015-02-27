@@ -62,4 +62,16 @@ Replace the ``*`` by the identifier you like, once for each parameter you want
 to pass to the command.
 
 
-Enjoy and improve !
+Credits
+-------
+
+This package was developed by `Affinitic team <https://github.com/affinitic>`_.
+
+.. image:: http://www.affinitic.be/affinitic_logo.png
+   :alt: Affinitic website
+   :target: http://www.affinitic.be
+
+``TracCommandHook`` is licensed under GNU General Public License, version 2.
+
+
+**Enjoy and improve !**
